@@ -1,39 +1,114 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Socket.IO chat</title>
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+<head>
+  <title>Socket.IO chat</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
       form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
       form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
       form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
-      #messages { margin-bottom: 40px }
     </style>
-  </head>
-  <body>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
-    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-    <script>
-      $(function () {
-        var socket = io();
-        $('form').submit(function(){
-          socket.emit('chat message', $('#m').val());
-          $('#m').val('');
-          return false;
-        });
-        socket.on('chat message', function(msg){
-          $('#messages').append($('<li>').text(msg));
-          window.scrollTo(0, document.body.scrollHeight);
-        });
-      });
-    </script>
-  </body>
+</head>
+
+<body>
+  <label id="username"></label>
+  
+  <div id="chat" style="height: 50vh;overflow: auto;">chat</div>
+  <div id="users" style="height: 20vh;overflow: auto;">users</div>
+  <form action="">
+    <input id="m" autocomplete="off" /><input type="button" value="send" onclick="setChat();">
+  </form>
+  <script type="text/javascript">
+    let activeUsers = document.getElementById("users");
+    let chatSection = document.getElementById("chat");
+    function setChat() {
+      let msg = document.getElementById("m").value;
+      console.log(msg);
+      let username = document.getElementById("username").innerText;
+      var oReq = new XMLHttpRequest();
+      oReq.open('POST', '/chat', true);
+      oReq.setRequestHeader('Content-type', 'text/plain');
+      oReq.onreadystatechange = function () {//Call a function when the state changes.
+        if (oReq.readyState == 4 && oReq.status == 200) {
+          let result = JSON.parse(oReq.response);
+          var text = document.createTextNode(``);
+          chatSection.appendChild(text);
+        }
+      };
+      let user = sessionStorage.getItem("lastname").toString();
+      let packet={"u_name":username,"msg":msg,"loginuser":user};
+      let data=JSON.stringify(packet);
+
+      oReq.send(data);
+      console.log("ghghghgh"+data);
+    }
+    function getChat() {
+      var oReq = new XMLHttpRequest();
+      oReq.open('POST', '/chat', true);
+      oReq.setRequestHeader('Content-type', 'text/plain');
+      oReq.onreadystatechange = function () {//Call a function when the state changes.
+        if (oReq.readyState == 4 && oReq.status == 200) {
+          let result = JSON.parse(oReq.response);
+          activeUsers.innerText = "";
+          result.forEach(element => {
+            let button = document.createElement("button");
+            let br = document.createElement("br");
+            button.id = element;
+            button.style.alignContent = 'left';
+            var text = document.createTextNode(`chat with ${element}`);
+            button.appendChild(text);
+            activeUsers.appendChild(br);
+            activeUsers.appendChild(button);
+
+          });
+        }
+      }
+      oReq.send("hi");
+    }
+
+    function sendReq() {
+      var oReq = new XMLHttpRequest();
+      oReq.open('POST', '/user', true);
+
+      //Send the proper header information along with the request
+      oReq.setRequestHeader('Content-type', 'text/plain');
+      oReq.onreadystatechange = function () {
+        //Call a function when the state changes.
+        if (oReq.readyState == 4 && oReq.status == 200) {
+          let result = JSON.parse(oReq.response);
+          activeUsers.innerText = "";
+          result.forEach(element => {
+            let button = document.createElement("button");
+            let br = document.createElement("br");
+            button.id = element;
+            button.style.alignContent = 'left';
+            var text = document.createTextNode(`chat with ${element}`);
+            button.appendChild(text);
+            button.onclick = () => {
+              document.getElementById("username").innerText = element;
+              console.log("before chat");
+             // chatinterval();
+
+            };
+            activeUsers.appendChild(br);
+            activeUsers.appendChild(button);
+
+          });
+        }
+      }
+      oReq.send("hi");
+    }
+    setInterval(() => {
+      sendReq();
+    }, 2000);
+    let chatinterval = () => {
+      setInterval(() => {
+        getChat();
+      }, 2000);
+    };  
+  </script>
+</body>
+
 </html>

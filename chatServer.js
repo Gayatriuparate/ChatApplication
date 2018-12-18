@@ -1,6 +1,5 @@
 var http = require('http');
 var fs = require('fs');
-const db = require('./DBConnection');
 
 const getResponse = (response, contentType, fileURL) => {
     response.writeHead(200, { 'Content-type': contentType });
@@ -12,10 +11,12 @@ const getResponse = (response, contentType, fileURL) => {
         response.end();
     });
 }
+var activeUsers = [];
+var sayings = new Map();
+
 
 http.createServer(function (request, response) {
-    var activeUsers=[];
-var sayings = new Map();
+
     let fileName = './login.html';
     let filetype = 'text/html'
     if (request.url.includes(".html")) {
@@ -28,31 +29,70 @@ var sayings = new Map();
         filetype = 'text/javascript';
     }
     switch (request.url) {
-        case '/chat':
-            console.log("in register case");
+        case '/user':
             response.writeHead(200, { 'Content-type': 'application/json' });
             request.on('data', (data) => {
-                let registerData = JSON.parse(data)
-                response.write(data);
+
+                response.write(JSON.stringify(activeUsers));
                 response.end();
             });
             break;
-        case '/valReq': response.writeHead(200, { 'Content-type': 'text/javascript' });
+        case '/chat':
+
+            response.writeHead(200, { 'Content-type': 'application/json' });
+
+            request.on('data', (data) => {
+                let info = JSON.parse(data);
+                console.log("t2 after click  "+info.loginuser)
+                let mymap = sayings.get(info.loginuser);
+                if (mymap.has(info.u_name)) {
+                    mymap.get(info.u_name).push(info.msg);
+                }
+                else {
+
+                    let a = [];
+                    a.push(info.msg);
+                    console.log("xdcvbvcxcvbvcxcv    " + info.u_name);
+                    mymap.set(info.u_name, a);
+                    console.log("in user111  " + mymap.get(info.u_name));
+
+                }
+                // console.log("in uesr  "+ mymap);
+                //console.log("sayings  "+sayings.get(info.loginuser).get(info.u_name));
+                console.log("sayings  " + sayings.get(info.loginuser).get(info.u_name));
+
+                // mymap.set()
+                response.write("drftyhuihthyt");
+                response.end();
+            });
+            break;
+        case '/valReq':
+            console.log("in val req");
+            response.writeHead(200, { 'Content-type': 'text/javascript' });
             request.on('data', (data) => {
                 let queryData = JSON.parse(data);
-                db.selectStatement(queryData.username, (result) => {
-                    let res = "Failed";
-                    if (result[0] != undefined) {
-                        let pass = result[0].password;
-                        if (queryData.password.toString() == pass) {
-                            res = "success";
-                            activeUsers.push(queryData.username);
-                        }
-                    }
-                    response.write(res);
-                    response.end();
+                activeUsers.push(queryData.username);
+                let mymap = new Map();
+                // sayings.set(queryData.username, mymap);
+                console.log("t2    "+queryData.username);
+                sayings.set(queryData.username, mymap);
 
-                });
+                response.write("success");
+                response.end();
+
+                // db.selectStatement(queryData.username, (result) => {
+                //     let res = "Failed";
+                //     if (result[0] != undefined) {
+                //         let pass = result[0].password;
+                //         if (queryData.password.toString() == pass) {
+                //             res = "success";
+                //             activeUsers.push(queryData.username);
+                //         }
+                //     }
+                //     response.write(res);
+                //     response.end();
+
+                // });
             });
             break;
         default:
