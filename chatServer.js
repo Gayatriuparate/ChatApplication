@@ -27,7 +27,12 @@ http.createServer(function (request, response) {
     } else if (request.url.includes(".js")) {
         fileName = `.${request.url}`;
         filetype = 'text/javascript';
+    }else if(request.url.includes('.svg')){
+      
+        filename= `.${request.url}`;
+        filetype = `image/svg+xml`;
     }
+    console.log(".svg image handling      :       " + fileName);
     switch (request.url) {
         case '/user':
             response.writeHead(200, { 'Content-type': 'application/json' });
