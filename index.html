@@ -39,26 +39,26 @@
 </head>
 
 <body style="height: 100%;">
-  <label id="username"></label>
   <div>
     <!-- style="height: 50vh;overflow: auto;" -->
-    <div class="chatdiv" id="chat"><label class="chats">Chat</label>
-      <div>
-        <form action="">
-          <div style="margin-top: 43%"><input type="text" class="msg" id="m" autocomplete="on">
-            <input type="button" class="send" onclick="setChat();"></div>
-        </form>
-      </div>
+    <div class="chatdiv" id="chat"><label class="chats" id="username">Chat</label>
+
     </div>
     <div class="Userdiv" id="users"><label class="userlist">Active Users</label></div>
   </div>
+
+  <input type="text" class="msg" id="m" autocomplete="on">
+  <input type="button" class="send" id="sent" onclick="setChat();">
   <script type="text/javascript">
     let activeUsers = document.getElementById("users");
     let chatSection = document.getElementById("chat");
     //SetChat()
+    let msgRef = document.getElementById("m");
     function setChat() {
       let username = document.getElementById("username").innerText;
-      let msg = document.getElementById("m").value;
+     
+      let msg = msgRef.value;
+      msgRef.value = "";
       var text = document.createTextNode(msg);
       let div = document.getElementById(username);
       console.log('div in setChat() :     ' + div);
@@ -116,7 +116,12 @@
         //Call a function when the state changes.
         if (oReq.readyState == 4 && oReq.status == 200) {
           let result = JSON.parse(oReq.response);
-          activeUsers.innerText = "";
+          var nodes = activeUsers.getElementsByTagName("button");
+
+          for (var i = 0, len = nodes.length; i != len; ++i) {
+            nodes[0].activeUsers.removeChild(nodes[0]);
+          }
+          // activeUsers.remove() = "";
           result.forEach(element => {
             if (element != user) {
               let button = document.createElement("button");
@@ -158,6 +163,14 @@
         getChat();
       }, 2000);
     };  
+    msgRef.addEventListener("keyup", function(event) {
+  event.preventDefault();
+  // Number 13 is the "Enter" key on the keyboard
+  if (event.keyCode === 13) {
+    // Trigger the button element with a click
+    document.getElementById("sent").click();
+  }
+});
   </script>
 </body>
 

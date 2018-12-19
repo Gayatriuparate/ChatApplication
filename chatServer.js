@@ -18,7 +18,7 @@ var sayings = new Map();
 http.createServer(function (request, response) {
 
     let fileName = './login.html';
-    let filetype = 'text/html'
+    let filetype = 'text/html';
     if (request.url.includes(".html")) {
         fileName = `.${request.url}`;
     } else if (request.url.includes(".css")) {
@@ -27,12 +27,12 @@ http.createServer(function (request, response) {
     } else if (request.url.includes(".js")) {
         fileName = `.${request.url}`;
         filetype = 'text/javascript';
-    }else if(request.url.includes('.svg')){
-      
-        filename= `.${request.url}`;
+    } else if (request.url.includes('.svg')) {
+
+        fileName = `.${request.url}`;
         filetype = `image/svg+xml`;
     }
-    console.log(".svg image handling      :       " + fileName);
+
     switch (request.url) {
         case '/user':
             response.writeHead(200, { 'Content-type': 'application/json' });
@@ -71,7 +71,7 @@ http.createServer(function (request, response) {
                     msg = mymap.get(info.loginuser);
                     response.write(JSON.stringify(msg));
                     response.end();
-                    while(msg.length > 0) {
+                    while (msg.length > 0) {
                         msg.pop();
                     }
                 }
