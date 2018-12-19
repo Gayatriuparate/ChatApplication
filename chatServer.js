@@ -43,7 +43,7 @@ http.createServer(function (request, response) {
 
             request.on('data', (data) => {
                 let info = JSON.parse(data);
-                console.log("t2 after click  "+info.loginuser)
+                console.log("t2 after click  " + info.loginuser)
                 let mymap = sayings.get(info.loginuser);
                 if (mymap.has(info.u_name)) {
                     mymap.get(info.u_name).push(info.msg);
@@ -74,7 +74,7 @@ http.createServer(function (request, response) {
                 activeUsers.push(queryData.username);
                 let mymap = new Map();
                 // sayings.set(queryData.username, mymap);
-                console.log("t2    "+queryData.username);
+                console.log("t2    " + queryData.username);
                 sayings.set(queryData.username, mymap);
 
                 response.write("success");
