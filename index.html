@@ -3,26 +3,55 @@
 
 <head>
   <meta charset="UTF-8">
+  <link rel="stylesheet" href="Styles.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Masala-chat</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-    </style>
+  <nav>
+    <table>
+      <tr class="navPadding">
+        <td>
+          <div>
+            <img src="baseline-forum-24px.svg" style="padding-top:10px;" style="padding-left:40px;" width="50px" height="50px">
+          </div>
+        </td>
+        <td>
+          <div>
+            <p class="project">Chat App</p>
+          </div>
+        </td>
+
+        <td>
+          <div class="user" style=" padding-left:930px;">
+            <p>Welcome User</p>
+
+          </div>
+        </td>
+        <td>
+          <div>
+            <img src="ac.svg" height="50px" width="50px">
+          </div>
+        </td>
+      </tr>
+    </table>
+  </nav>
+
+  <title>Chat</title>
 </head>
 
-<body>
+<body style="height: 100%;" >
   <label id="username"></label>
-
-  <div id="chat" style="height: 50vh;overflow: auto;">chat</div>
-  <div id="users" style="height: 20vh;overflow: auto;">users</div>
-  <form action="">
-    <input id="m" autocomplete="off" /><input type="button" value="send" onclick="setChat();">
-  </form>
+  <div>
+    <!-- style="height: 50vh;overflow: auto;" -->
+    <div class="chatdiv" id="chat"><label class="chats">Chat</label>
+      <div>
+        <form action="">
+          <div style="margin-top: 43%"><input type="text" class="msg" id="m" autocomplete="on">
+            <input type="button" class="send" onclick="setChat();"></div>
+        </form>
+      </div>
+    </div>
+    <div class="Userdiv" id="users"><label class="userlist">Active Users</label></div>
+  </div>
   <script type="text/javascript">
     let activeUsers = document.getElementById("users");
     let chatSection = document.getElementById("chat");
