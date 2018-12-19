@@ -2,7 +2,10 @@
 <html>
 
 <head>
-  <title>Socket.IO chat</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Masala-chat</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
@@ -14,7 +17,7 @@
 
 <body>
   <label id="username"></label>
-  
+
   <div id="chat" style="height: 50vh;overflow: auto;">chat</div>
   <div id="users" style="height: 20vh;overflow: auto;">users</div>
   <form action="">
@@ -25,53 +28,52 @@
     let chatSection = document.getElementById("chat");
     function setChat() {
       let msg = document.getElementById("m").value;
-      console.log(msg);
       let username = document.getElementById("username").innerText;
       var oReq = new XMLHttpRequest();
-      oReq.open('POST', '/chat', true);
+      oReq.open('POST', '/setChat', true);
       oReq.setRequestHeader('Content-type', 'text/plain');
       oReq.onreadystatechange = function () {//Call a function when the state changes.
         if (oReq.readyState == 4 && oReq.status == 200) {
           let result = JSON.parse(oReq.response);
-          var text = document.createTextNode(``);
+          var text = document.createTextNode(msg);
           chatSection.appendChild(text);
         }
       };
       let user = sessionStorage.getItem("lastname").toString();
-      let packet={"u_name":username,"msg":msg,"loginuser":user};
-      let data=JSON.stringify(packet);
+      let packet = { "u_name": username, "msg": msg, "loginuser": user };
+      let data = JSON.stringify(packet);
 
       oReq.send(data);
-      console.log("ghghghgh"+data);
     }
     function getChat() {
+      let username = document.getElementById("username").innerText;
       var oReq = new XMLHttpRequest();
-      oReq.open('POST', '/chat', true);
+      oReq.open('POST', '/getChat', true);
       oReq.setRequestHeader('Content-type', 'text/plain');
       oReq.onreadystatechange = function () {//Call a function when the state changes.
         if (oReq.readyState == 4 && oReq.status == 200) {
-          let result = JSON.parse(oReq.response);
-          activeUsers.innerText = "";
-          result.forEach(element => {
-            let button = document.createElement("button");
-            let br = document.createElement("br");
-            button.id = element;
-            button.style.alignContent = 'left';
-            var text = document.createTextNode(`chat with ${element}`);
-            button.appendChild(text);
-            activeUsers.appendChild(br);
-            activeUsers.appendChild(button);
+          let result;
+          if (oReq.response != '') {
+            result = JSON.parse(oReq.response);
+          }
+          for (i = 0; i < result.length; i++) {
+            var text = document.createTextNode(result[i]);
+            chatSection.appendChild(document.createElement("br"));
+            chatSection.appendChild(text);
 
-          });
+          }
         }
-      }
-      oReq.send("hi");
+      };
+      let user = sessionStorage.getItem("lastname").toString();
+      let packet = { "u_name": username, "loginuser": user };
+      let data = JSON.stringify(packet);
+      oReq.send(data);
     }
 
     function sendReq() {
       var oReq = new XMLHttpRequest();
       oReq.open('POST', '/user', true);
-
+      let user = sessionStorage.getItem("lastname").toString();
       //Send the proper header information along with the request
       oReq.setRequestHeader('Content-type', 'text/plain');
       oReq.onreadystatechange = function () {
@@ -80,21 +82,23 @@
           let result = JSON.parse(oReq.response);
           activeUsers.innerText = "";
           result.forEach(element => {
-            let button = document.createElement("button");
-            let br = document.createElement("br");
-            button.id = element;
-            button.style.alignContent = 'left';
-            var text = document.createTextNode(`chat with ${element}`);
-            button.appendChild(text);
-            button.onclick = () => {
-              document.getElementById("username").innerText = element;
-              console.log("before chat");
-             // chatinterval();
+            if (element != user) {
+              let button = document.createElement("button");
+              let br = document.createElement("br");
+              button.id = element;
+              button.style.alignContent = 'left';
+              var text = document.createTextNode(`chat with ${element}`);
+              button.appendChild(text);
+              button.onclick = () => {
+                document.getElementById("username").innerText = element;
+                console.log("before chat");
+                clearInterval(chatinterval);
+                chatinterval();
+              };
 
-            };
-            activeUsers.appendChild(br);
-            activeUsers.appendChild(button);
-
+              activeUsers.appendChild(br);
+              activeUsers.appendChild(button);
+            }
           });
         }
       }

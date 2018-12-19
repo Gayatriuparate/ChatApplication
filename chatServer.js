@@ -37,44 +37,51 @@ http.createServer(function (request, response) {
                 response.end();
             });
             break;
-        case '/chat':
-
+        case '/setChat':
             response.writeHead(200, { 'Content-type': 'application/json' });
 
             request.on('data', (data) => {
                 let info = JSON.parse(data);
-                console.log("t2 after click  "+info.loginuser)
                 let mymap = sayings.get(info.loginuser);
                 if (mymap.has(info.u_name)) {
                     mymap.get(info.u_name).push(info.msg);
                 }
                 else {
-
                     let a = [];
                     a.push(info.msg);
-                    console.log("xdcvbvcxcvbvcxcv    " + info.u_name);
                     mymap.set(info.u_name, a);
-                    console.log("in user111  " + mymap.get(info.u_name));
 
                 }
-                // console.log("in uesr  "+ mymap);
-                //console.log("sayings  "+sayings.get(info.loginuser).get(info.u_name));
-                console.log("sayings  " + sayings.get(info.loginuser).get(info.u_name));
-
-                // mymap.set()
-                response.write("drftyhuihthyt");
                 response.end();
             });
             break;
+        case '/getChat':
+            response.writeHead(200, { 'Content-type': 'application/json' });
+
+            request.on('data', (data) => {
+                let info = JSON.parse(data);
+                let mymap = sayings.get(info.u_name);
+                let msg;
+                if (mymap.has(info.loginuser)) {
+                    msg = mymap.get(info.loginuser);
+                    response.write(JSON.stringify(msg));
+                    response.end();
+                    while(msg.length > 0) {
+                        msg.pop();
+                    }
+                }
+                else {
+                    //response.write('hiii');
+                    response.end();
+                }
+            });
+            break;
         case '/valReq':
-            console.log("in val req");
             response.writeHead(200, { 'Content-type': 'text/javascript' });
             request.on('data', (data) => {
                 let queryData = JSON.parse(data);
                 activeUsers.push(queryData.username);
                 let mymap = new Map();
-                // sayings.set(queryData.username, mymap);
-                console.log("t2    "+queryData.username);
                 sayings.set(queryData.username, mymap);
 
                 response.write("success");
